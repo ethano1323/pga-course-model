@@ -1,21 +1,16 @@
-import sys
-import os
-
-sys.path.append(os.path.dirname(__file__))
-
 import streamlit as st
 import pandas as pd
 
-import model.course_fit as course_fit
-import model.fantasy as fantasy
+from course_fit import calculate_course_fit
+from fantasy import project_fantasy_points
 
 st.set_page_config(page_title="PGA Course Fit Model", layout="wide")
 
 st.title("🏌️ PGA Course Fit & Fantasy Projection Model")
 
-# -------------------------------
-# Load Data
-# -------------------------------
+# -----------------------------
+# Upload Golfer Data
+# -----------------------------
 st.sidebar.header("Upload Golfer SG Data")
 
 uploaded_file = st.sidebar.file_uploader(
@@ -23,7 +18,7 @@ uploaded_file = st.sidebar.file_uploader(
     type=["csv"]
 )
 
-if uploaded_file:
+if uploaded_file is not None:
     golfers = pd.read_csv(uploaded_file)
 else:
     golfers = pd.read_csv("data/golfer_sg.csv")
@@ -31,9 +26,9 @@ else:
 st.subheader("Golfer Data")
 st.dataframe(golfers)
 
-# -------------------------------
-# Course Weight Inputs
-# -------------------------------
+# -----------------------------
+# Course Weights
+# -----------------------------
 st.sidebar.header("Course Skill Weights")
 
 w_app  = st.sidebar.slider("Approach", 0.0, 1.0, 0.40)
@@ -42,9 +37,8 @@ w_atg  = st.sidebar.slider("Around the Green", 0.0, 1.0, 0.20)
 w_putt = st.sidebar.slider("Putting", 0.0, 1.0, 0.15)
 
 weight_sum = w_app + w_ott + w_atg + w_putt
-
 if weight_sum != 1.0:
-    st.sidebar.warning(f"Weights sum to {weight_sum:.2f}. Recommended: 1.00")
+    st.sidebar.warning(f"Weights sum to {weight_sum:.2f} (recommended: 1.00)")
 
 weights = {
     "app": w_app,
@@ -53,9 +47,9 @@ weights = {
     "putt": w_putt
 }
 
-# -------------------------------
+# -----------------------------
 # Course Difficulty
-# -------------------------------
+# -----------------------------
 st.sidebar.header("Course Difficulty")
 
 course_avg_score = st.sidebar.number_input(
@@ -67,23 +61,22 @@ course_avg_score = st.sidebar.number_input(
 )
 
 difficulty_multiplier = 72 / course_avg_score
-
 st.sidebar.caption(
     f"Difficulty Multiplier: {difficulty_multiplier:.3f}"
 )
 
-# -------------------------------
+# -----------------------------
 # Run Model
-# -------------------------------
+# -----------------------------
 ranked = calculate_course_fit(golfers.copy(), weights)
 ranked = project_fantasy_points(
     ranked,
     difficulty_multiplier=difficulty_multiplier
 )
 
-# -------------------------------
+# -----------------------------
 # Results
-# -------------------------------
+# -----------------------------
 st.subheader("Course Fit Rankings")
 st.dataframe(
     ranked[["player", "course_fit"]].reset_index(drop=True)
@@ -94,9 +87,9 @@ st.dataframe(
     ranked[["player", "fantasy_points"]].reset_index(drop=True)
 )
 
-# -------------------------------
+# -----------------------------
 # Download
-# -------------------------------
+# -----------------------------
 st.download_button(
     label="Download Results CSV",
     data=ranked.to_csv(index=False),
