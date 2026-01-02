@@ -6,8 +6,8 @@ sys.path.append(os.path.dirname(__file__))
 import streamlit as st
 import pandas as pd
 
-from model.course_fit import calculate_course_fit
-from model.fantasy import project_fantasy_points
+import model.course_fit as course_fit
+import model.fantasy as fantasy
 
 st.set_page_config(page_title="PGA Course Fit Model", layout="wide")
 
