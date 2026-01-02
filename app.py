@@ -36,10 +36,6 @@ w_ott  = st.sidebar.slider("Off the Tee", 0.0, 1.0, 0.25)
 w_atg  = st.sidebar.slider("Around the Green", 0.0, 1.0, 0.20)
 w_putt = st.sidebar.slider("Putting", 0.0, 1.0, 0.15)
 
-weight_sum = w_app + w_ott + w_atg + w_putt
-if weight_sum != 1.0:
-    st.sidebar.warning(f"Weights sum to {weight_sum:.2f} (recommended: 1.00)")
-
 weights = {
     "app": w_app,
     "ott": w_ott,
@@ -61,9 +57,6 @@ course_avg_score = st.sidebar.number_input(
 )
 
 difficulty_multiplier = 72 / course_avg_score
-st.sidebar.caption(
-    f"Difficulty Multiplier: {difficulty_multiplier:.3f}"
-)
 
 # -----------------------------
 # Run Model
@@ -78,22 +71,18 @@ ranked = project_fantasy_points(
 # Results
 # -----------------------------
 st.subheader("Course Fit Rankings")
-st.dataframe(
-    ranked[["player", "course_fit"]].reset_index(drop=True)
-)
+st.dataframe(ranked[["player", "course_fit"]].reset_index(drop=True))
 
 st.subheader("Fantasy Point Projections")
-st.dataframe(
-    ranked[["player", "fantasy_points"]].reset_index(drop=True)
-)
+st.dataframe(ranked[["player", "fantasy_points"]].reset_index(drop=True))
 
 # -----------------------------
 # Download
 # -----------------------------
 st.download_button(
-    label="Download Results CSV",
-    data=ranked.to_csv(index=False),
-    file_name="pga_course_model_output.csv",
-    mime="text/csv"
+    "Download Results CSV",
+    ranked.to_csv(index=False),
+    "pga_course_model_output.csv",
+    "text/csv"
 )
 
