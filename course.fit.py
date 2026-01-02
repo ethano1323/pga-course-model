@@ -1,7 +1,7 @@
 def calculate_course_fit(df, weights):
     """
-    Calculates course-fit score by anchoring to base_sg
-    and reweighting skill distribution based on course demands.
+    Anchors projections to base_sg and reweights skill profile
+    based on user-defined course demands.
     """
 
     skill_total = (
@@ -21,4 +21,5 @@ def calculate_course_fit(df, weights):
     df["course_fit"] = df["base_sg"] * (df["skill_weighted"] / skill_total)
 
     return df.sort_values("course_fit", ascending=False)
+
 
