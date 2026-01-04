@@ -118,10 +118,12 @@ display_df = ranked[
 ].reset_index(drop=True)
 
 def efficiency_color(val):
-    if val >= 0:
+    if val > 0.25:
         return "background-color: #1b7837"  # dark green
-    else:
+    elif val < -0.25:
         return "background-color: #762a83"  # dark red
+    else:
+        return ""
 
 st.dataframe(
     display_df.style.applymap(
