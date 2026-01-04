@@ -44,11 +44,6 @@ if missing_cols:
     st.stop()
 
 st.subheader("Uploaded Golfer Data")
-st.dataframe(
-    display_df.style.applymap(
-        efficiency_color,
-        subset=["efficiency"]
-    )
 )
 
 # -----------------------------------
@@ -145,6 +140,7 @@ display_df = ranked[
         "expected_rounds",
         "efficiency",
     ]
+
 ].reset_index(drop=True)
 
 # 2️⃣ Define the color function
