@@ -50,9 +50,9 @@ st.dataframe(golfers)
 # -----------------------------------
 st.sidebar.header("Course Skill Weights")
 
-w_app  = st.sidebar.slider("Approach", 0.0, 1.0, 0.33)
+w_app  = st.sidebar.slider("Approach", 0.0, 1.0, 0.34)
 w_ott  = st.sidebar.slider("Off the Tee", 0.0, 1.0, 0.25)
-w_atg  = st.sidebar.slider("Around the Green", 0.0, 1.0, 0.17)
+w_atg  = st.sidebar.slider("Around the Green", 0.0, 1.0, 0.16)
 w_putt = st.sidebar.slider("Putting", 0.0, 1.0, 0.25)
 
 weights = {
@@ -125,12 +125,24 @@ def efficiency_color(val):
     else:
         return ""
 
-st.dataframe(
-    display_df.style.applymap(
+styled_df = (
+    display_df
+    .style
+    .format({
+        "base_sg": "{:.2f}",
+        "course_sg": "{:.2f}",
+        "differential": "{:.2f}",
+        "cut_prob": "{:.2f}",
+        "expected_rounds": "{:.2f}",
+        "efficiency": "{:.2f}",
+    })
+    .applymap(
         efficiency_color,
         subset=["efficiency"],
     )
 )
+
+st.dataframe(styled_df)
 
 # -----------------------------------
 # Download
