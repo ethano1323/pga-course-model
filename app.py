@@ -12,7 +12,8 @@ st.title("🏌️ PGA Course-Adjusted SG & Fantasy Projection Model")
 # -----------------------------------
 # Upload Golfer Data (REQUIRED)
 # -----------------------------------
-st.sidebar.header("Upload Golfer SG Data")
+st.subheader("Uploaded Golfer Data")
+st.dataframe(golfers)
 
 uploaded_file = st.sidebar.file_uploader(
     "Upload golfer SG CSV",
@@ -24,6 +25,9 @@ if uploaded_file is None:
     st.stop()
 
 golfers = pd.read_csv(uploaded_file)
+
+st.write("Columns detected:", list(golfers.columns))
+
 
 # -----------------------------------
 # Validate Columns
