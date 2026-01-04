@@ -5,7 +5,6 @@ def project_fantasy_points(df, difficulty_multiplier, scale=100):
 
     df["fantasy_points"] = (
         df["course_sg"] * scale * difficulty_multiplier
-    )
+    ).round(2)
 
     return df
-
