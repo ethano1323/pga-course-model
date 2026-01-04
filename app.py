@@ -44,7 +44,12 @@ if missing_cols:
     st.stop()
 
 st.subheader("Uploaded Golfer Data")
-st.dataframe(golfers)
+st.dataframe(
+    display_df.style.applymap(
+        efficiency_color,
+        subset=["efficiency"]
+    )
+)
 
 # -----------------------------------
 # Course Weights
@@ -129,19 +134,26 @@ ranked = add_cut_and_round_expectations(
 # -----------------------------------
 st.subheader("Course-Adjusted SG Rankings")
 
-st.dataframe(
-    ranked[
-        [
-            "player",
-            "base_sg",
-            "course_sg",
-            "differential",
-            "fit_ratio",
-            "cut_prob",
-            "expected_rounds",
-        ]
-    ].reset_index(drop=True)
-)
+display_df = ranked[
+    [
+        "player",
+        "base_sg",
+        "course_sg",
+        "differential",
+        "cut_prob",
+        "expected_rounds",
+        "efficiency",   # moved to far right
+    ]
+].reset_index(drop=True)
+
+def efficiency_color(val):
+    """
+    Dark green (good) -> white -> dark red (bad)
+    """
+    if val >= 0:
+        return f"background-color: rgba(0, 128, 0, {min(abs(val), 1)})"
+    else:
+        return f"background-color: rgba(139, 0, 0, {min(abs(val), 1)})"
 
 
 # -----------------------------------
