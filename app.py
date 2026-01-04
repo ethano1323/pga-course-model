@@ -98,8 +98,11 @@ ranked = project_fantasy_points(
 # -----------------------------------
 st.subheader("Course-Adjusted SG Rankings")
 st.dataframe(
-    ranked[["player", "course_sg"]].reset_index(drop=True)
+    ranked[
+        ["player", "base_sg", "course_sg", "sg_delta"]
+    ].reset_index(drop=True)
 )
+
 
 st.subheader("Fantasy Point Projections")
 st.dataframe(
