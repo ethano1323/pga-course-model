@@ -50,14 +50,15 @@ st.dataframe(golfers)
 # -----------------------------------
 st.sidebar.header("Course Skill Weights")
 
-w_app  = st.sidebar.slider("Approach", 0.0, 1.0, 0.40)
+w_app  = st.sidebar.slider("Approach", 0.0, 1.0, 0.33)
 w_ott  = st.sidebar.slider("Off the Tee", 0.0, 1.0, 0.25)
-w_atg  = st.sidebar.slider("Around the Green", 0.0, 1.0, 0.20)
-w_putt = st.sidebar.slider("Putting", 0.0, 1.0, 0.15)
+w_atg  = st.sidebar.slider("Around the Green", 0.0, 1.0, 0.17)
+w_putt = st.sidebar.slider("Putting", 0.0, 1.0, 0.25)
 
-weight_sum = w_app + w_ott + w_atg + w_putt
-if abs(weight_sum - 1.0) > 0.001:
-    st.sidebar.warning(f"Weights sum to {weight_sum:.2f} (recommended: 1.00)")
+st.sidebar.caption(
+    "Weights represent how much the course rewards each skill.\n"
+    "They do NOT need to sum to 1."
+)
 
 weights = {
     "app": w_app,
@@ -99,7 +100,7 @@ ranked = project_fantasy_points(
 st.subheader("Course-Adjusted SG Rankings")
 st.dataframe(
     ranked[
-        ["player", "base_sg", "course_sg", "sg_delta"]
+        ["player", "base_sg", "course_sg", "differential"]
     ].reset_index(drop=True)
 )
 
@@ -108,6 +109,7 @@ st.subheader("Fantasy Point Projections")
 st.dataframe(
     ranked[["player", "fantasy_points"]].reset_index(drop=True)
 )
+
 
 # -----------------------------------
 # Download
