@@ -21,11 +21,11 @@ def calculate_course_fit(df, weights):
     df["differential"] = df["course_sg"] - df["base_sg"]
 
     # Talent-normalized course fit ratio (stable)
-    df["fit_ratio"] = df["differential"] / df["base_sg"].abs().clip(lower=0.50)
+    df["efficiency"] = df["differential"] / df["base_sg"].abs().clip(lower=0.50)
 
     # Round outputs
     df["course_sg"] = df["course_sg"].round(2)
     df["differential"] = df["differential"].round(2)
-    df["fit_ratio"] = df["fit_ratio"].round(2)
+    df["efficiency"] = df["efficiency"].round(2)
 
     return df.sort_values("course_sg", ascending=False)
