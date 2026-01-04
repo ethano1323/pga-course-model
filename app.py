@@ -4,7 +4,6 @@ import pandas as pd
 from course_fit import calculate_course_fit
 from fantasy import add_cut_and_round_expectations
 
-
 st.set_page_config(page_title="PGA Course Fit Model", layout="wide")
 
 st.title("🏌️ PGA Course-Adjusted SG & Fantasy Projection Model")
@@ -12,8 +11,7 @@ st.title("🏌️ PGA Course-Adjusted SG & Fantasy Projection Model")
 # -----------------------------------
 # Upload Golfer Data (REQUIRED)
 # -----------------------------------
-st.subheader("Uploaded Golfer Data")
-st.dataframe(golfers)
+st.sidebar.header("Upload Golfer SG Data")
 
 uploaded_file = st.sidebar.file_uploader(
     "Upload golfer SG CSV",
@@ -26,9 +24,6 @@ if uploaded_file is None:
 
 golfers = pd.read_csv(uploaded_file)
 
-st.write("Columns detected:", list(golfers.columns))
-
-
 # -----------------------------------
 # Validate Columns
 # -----------------------------------
@@ -38,7 +33,7 @@ required_columns = {
     "sg_app",
     "sg_atg",
     "sg_putt",
-    "sg_ott"
+    "sg_ott",
 }
 
 missing_cols = required_columns - set(golfers.columns)
@@ -48,7 +43,7 @@ if missing_cols:
     st.stop()
 
 st.subheader("Uploaded Golfer Data")
-)
+st.dataframe(golfers)
 
 # -----------------------------------
 # Course Weights
@@ -60,20 +55,15 @@ w_ott  = st.sidebar.slider("Off the Tee", 0.0, 1.0, 0.25)
 w_atg  = st.sidebar.slider("Around the Green", 0.0, 1.0, 0.17)
 w_putt = st.sidebar.slider("Putting", 0.0, 1.0, 0.25)
 
-st.sidebar.caption(
-    "Weights represent how much the course rewards each skill.\n"
-    "They do NOT need to sum to 1."
-)
-
 weights = {
     "app": w_app,
     "ott": w_ott,
     "atg": w_atg,
-    "putt": w_putt
+    "putt": w_putt,
 }
 
 # -----------------------------------
-# Course Weights
+# Event Structure
 # -----------------------------------
 st.sidebar.header("Event Structure")
 
@@ -82,7 +72,7 @@ total_rounds = st.sidebar.number_input(
     min_value=2,
     max_value=5,
     value=4,
-    step=1
+    step=1,
 )
 
 cut_size = st.sidebar.number_input(
@@ -90,37 +80,19 @@ cut_size = st.sidebar.number_input(
     min_value=1,
     max_value=len(golfers),
     value=65,
-    step=1
+    step=1,
 )
 
 all_play_all = st.sidebar.checkbox(
     "All golfers play all rounds",
-    value=False
-)
-
-
-# -----------------------------------
-# Course Difficulty
-# -----------------------------------
-st.sidebar.header("Course Difficulty")
-
-course_avg_score = st.sidebar.number_input(
-    "Average Course Score (Par 72)",
-    min_value=65.0,
-    max_value=75.0,
-    value=71.5,
-    step=0.1
-)
-
-difficulty_multiplier = 72 / course_avg_score
-st.sidebar.caption(
-    f"Difficulty Multiplier: {difficulty_multiplier:.3f}"
+    value=False,
 )
 
 # -----------------------------------
 # Run Model
 # -----------------------------------
 ranked = calculate_course_fit(golfers.copy(), weights)
+
 ranked = add_cut_and_round_expectations(
     ranked,
     total_rounds=total_rounds,
@@ -133,7 +105,6 @@ ranked = add_cut_and_round_expectations(
 # -----------------------------------
 st.subheader("Course-Adjusted SG Rankings")
 
-# 1️⃣ Build the display dataframe FIRST
 display_df = ranked[
     [
         "player",
@@ -144,33 +115,28 @@ display_df = ranked[
         "expected_rounds",
         "efficiency",
     ]
-
 ].reset_index(drop=True)
 
-# 2️⃣ Define the color function
 def efficiency_color(val):
     if val >= 0:
-        return f"background-color: rgba(0, 128, 0, {min(abs(val), 1)})"
+        return "background-color: #1b7837"  # dark green
     else:
-        return f"background-color: rgba(139, 0, 0, {min(abs(val), 1)})"
+        return "background-color: #762a83"  # dark red
 
-# 3️⃣ Display with styling
 st.dataframe(
     display_df.style.applymap(
         efficiency_color,
-        subset=["efficiency"]
+        subset=["efficiency"],
     )
 )
-
-
 
 # -----------------------------------
 # Download
 # -----------------------------------
 st.download_button(
-    "Download Results CSV",
-    ranked.to_csv(index=False),
-    "pga_course_adjusted_sg_output.csv",
-    "text/csv"
+    label="Download Results CSV",
+    data=ranked.to_csv(index=False),
+    file_name="pga_course_adjusted_sg_output.csv",
+    mime="text/csv",
 )
 
