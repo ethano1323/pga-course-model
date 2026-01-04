@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 
 from course_fit import calculate_course_fit
-from fantasy import project_fantasy_points
 from fantasy import add_cut_and_round_expectations
 
 
