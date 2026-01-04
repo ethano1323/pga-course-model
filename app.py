@@ -134,6 +134,7 @@ ranked = add_cut_and_round_expectations(
 # -----------------------------------
 st.subheader("Course-Adjusted SG Rankings")
 
+# 1️⃣ Build the display dataframe FIRST
 display_df = ranked[
     [
         "player",
@@ -142,18 +143,25 @@ display_df = ranked[
         "differential",
         "cut_prob",
         "expected_rounds",
-        "efficiency",   # moved to far right
+        "efficiency",
     ]
 ].reset_index(drop=True)
 
+# 2️⃣ Define the color function
 def efficiency_color(val):
-    """
-    Dark green (good) -> white -> dark red (bad)
-    """
     if val >= 0:
         return f"background-color: rgba(0, 128, 0, {min(abs(val), 1)})"
     else:
         return f"background-color: rgba(139, 0, 0, {min(abs(val), 1)})"
+
+# 3️⃣ Display with styling
+st.dataframe(
+    display_df.style.applymap(
+        efficiency_color,
+        subset=["efficiency"]
+    )
+)
+
 
 
 # -----------------------------------
