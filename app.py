@@ -3,6 +3,8 @@ import pandas as pd
 
 from course_fit import calculate_course_fit
 from fantasy import project_fantasy_points
+from fantasy import add_cut_and_round_expectations
+
 
 st.set_page_config(page_title="PGA Course Fit Model", layout="wide")
 
@@ -68,6 +70,33 @@ weights = {
 }
 
 # -----------------------------------
+# Course Weights
+# -----------------------------------
+st.sidebar.header("Event Structure")
+
+total_rounds = st.sidebar.number_input(
+    "Total Rounds",
+    min_value=2,
+    max_value=5,
+    value=4,
+    step=1
+)
+
+cut_size = st.sidebar.number_input(
+    "Golfers Making the Cut",
+    min_value=1,
+    max_value=len(golfers),
+    value=65,
+    step=1
+)
+
+all_play_all = st.sidebar.checkbox(
+    "All golfers play all rounds",
+    value=False
+)
+
+
+# -----------------------------------
 # Course Difficulty
 # -----------------------------------
 st.sidebar.header("Course Difficulty")
@@ -89,25 +118,30 @@ st.sidebar.caption(
 # Run Model
 # -----------------------------------
 ranked = calculate_course_fit(golfers.copy(), weights)
-ranked = project_fantasy_points(
+ranked = add_cut_and_round_expectations(
     ranked,
-    difficulty_multiplier=difficulty_multiplier
+    total_rounds=total_rounds,
+    cut_size=cut_size,
+    all_play_all=all_play_all,
 )
 
 # -----------------------------------
 # Results
 # -----------------------------------
 st.subheader("Course-Adjusted SG Rankings")
+
 st.dataframe(
     ranked[
-        ["player", "base_sg", "course_sg", "differential", "fit_ratio"]
+        [
+            "player",
+            "base_sg",
+            "course_sg",
+            "differential",
+            "fit_ratio",
+            "cut_prob",
+            "expected_rounds",
+        ]
     ].reset_index(drop=True)
-)
-
-
-st.subheader("Fantasy Point Projections")
-st.dataframe(
-    ranked[["player", "fantasy_points"]].reset_index(drop=True)
 )
 
 
