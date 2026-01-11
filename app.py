@@ -13,20 +13,27 @@ st.title("🏌️ PGA Course-Adjusted SG & Fantasy Projection Model")
 # -----------------------------------
 st.sidebar.header("Upload Golfer SG Data")
 
-uploaded_file = st.sidebar.file_uploader(
-    "Upload golfer SG CSV",
-    type=["csv"]
+uploaded_2025 = st.sidebar.file_uploader(
+    "Upload 2025 Golfer SG CSV",
+    type=["csv"],
 )
 
-if uploaded_file is None:
-    st.warning("Please upload a golfer SG CSV to continue.")
+uploaded_3yr = st.sidebar.file_uploader(
+    "Upload 3-Year Historical SG CSV",
+    type=["csv"],
+)
+
+if uploaded_2025 is None or uploaded_3yr is None:
+    st.warning("Please upload BOTH the 2025 and 3-Year SG CSVs to continue.")
     st.stop()
 
-golfers = pd.read_csv(uploaded_file)
+golfers_2025 = pd.read_csv(uploaded_2025)
+golfers_3yr = pd.read_csv(uploaded_3yr)
 
 # -----------------------------------
 # Validate Columns
 # -----------------------------------
+
 required_columns = {
     "player",
     "base_sg",
@@ -36,14 +43,50 @@ required_columns = {
     "sg_ott",
 }
 
-missing_cols = required_columns - set(golfers.columns)
+missing_2025 = required_columns - set(golfers_2025.columns)
+missing_3yr = required_columns - set(golfers_3yr.columns)
 
-if missing_cols:
-    st.error(f"Missing required columns: {', '.join(missing_cols)}")
+if missing_2025:
+    st.error(f"2025 data missing columns: {', '.join(missing_2025)}")
     st.stop()
 
-st.subheader("Uploaded Golfer Data")
-st.dataframe(golfers)
+if missing_3yr:
+    st.error(f"3-Year data missing columns: {', '.join(missing_3yr)}")
+    st.stop()
+
+# -----------------------------------
+# Merge the Data
+# -----------------------------------
+
+golfers = golfers_2025.merge(
+    golfers_3yr,
+    on="player",
+    suffixes=("_2025", "_3yr"),
+    how="inner",
+)
+
+# -----------------------------------
+# Blend Base SG then keep 2025 Splits
+# -----------------------------------
+
+golfers["base_sg"] = (
+    0.7 * golfers["base_sg_2025"]
+    + 0.3 * golfers["base_sg_3yr"]
+)
+
+golfers["sg_app"] = golfers["sg_app_2025"]
+golfers["sg_ott"] = golfers["sg_ott_2025"]
+golfers["sg_atg"] = golfers["sg_atg_2025"]
+golfers["sg_putt"] = golfers["sg_putt_2025"]
+
+# -----------------------------------
+# Hiding Poor Values
+# -----------------------------------
+
+if hide_negative:
+    golfers = golfers[golfers["base_sg"] >= 0.0]
+elif hide_bad:
+    golfers = golfers[golfers["base_sg"] >= -0.75]
 
 # -----------------------------------
 # Course Weights
