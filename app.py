@@ -295,6 +295,8 @@ st.dataframe(
     use_container_width=True
 )
 
+st.subheader("Course-Adjusted SG Rankings")
+
 st.dataframe(styled_df)
 
 # -----------------------------------
