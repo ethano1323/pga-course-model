@@ -80,32 +80,6 @@ golfers["sg_atg"] = golfers["sg_atg_2025"]
 golfers["sg_putt"] = golfers["sg_putt_2025"]
 
 # -----------------------------------
-# Hiding Poor Values
-# -----------------------------------
-
-if hide_negative:
-    golfers = golfers[golfers["base_sg"] >= 0.0]
-elif hide_bad:
-    golfers = golfers[golfers["base_sg"] >= -0.75]
-
-# -----------------------------------
-# Course Weights
-# -----------------------------------
-st.sidebar.header("Course Skill Weights")
-
-w_app  = st.sidebar.slider("Approach", 0.0, 1.0, 0.32)
-w_ott  = st.sidebar.slider("Off the Tee", 0.0, 1.0, 0.28)
-w_atg  = st.sidebar.slider("Around the Green", 0.0, 1.0, 0.18)
-w_putt = st.sidebar.slider("Putting", 0.0, 1.0, 0.22)
-
-weights = {
-    "app": w_app,
-    "ott": w_ott,
-    "atg": w_atg,
-    "putt": w_putt,
-}
-
-# -----------------------------------
 # Event Structure
 # -----------------------------------
 st.sidebar.header("Event Structure")
@@ -145,6 +119,32 @@ hide_negative = st.sidebar.checkbox(
     "Hide players below 0.00 base SG",
     value=False,
 )
+
+# -----------------------------------
+# Hiding Poor Values
+# -----------------------------------
+
+if hide_negative:
+    golfers = golfers[golfers["base_sg"] >= 0.0]
+elif hide_bad:
+    golfers = golfers[golfers["base_sg"] >= -0.75]
+
+# -----------------------------------
+# Course Weights
+# -----------------------------------
+st.sidebar.header("Course Skill Weights")
+
+w_app  = st.sidebar.slider("Approach", 0.0, 1.0, 0.32)
+w_ott  = st.sidebar.slider("Off the Tee", 0.0, 1.0, 0.28)
+w_atg  = st.sidebar.slider("Around the Green", 0.0, 1.0, 0.18)
+w_putt = st.sidebar.slider("Putting", 0.0, 1.0, 0.22)
+
+weights = {
+    "app": w_app,
+    "ott": w_ott,
+    "atg": w_atg,
+    "putt": w_putt,
+}
 
 # -----------------------------------
 # Run Model
