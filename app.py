@@ -82,7 +82,7 @@ def simulate_true_odds(
 
 st.set_page_config(page_title="PGA Course Fit Model", layout="wide")
 
-st.title("🏌️ PGA Course-Adjusted SG & Fantasy Projection Model")
+st.title("PGA Projection and Simulation Model")
 
 # -----------------------------------
 # Upload Golfer Data (REQUIRED)
@@ -242,8 +242,6 @@ true_odds_df = simulate_true_odds(
 # -----------------------------------
 # Results
 # -----------------------------------
-st.subheader("Course-Adjusted SG Rankings")
-
 display_df = ranked[
     [
         "player",
