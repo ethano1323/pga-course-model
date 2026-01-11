@@ -157,10 +157,9 @@ ranked = add_cut_and_round_expectations(
     total_rounds=total_rounds,
     cut_size=cut_size,
     all_play_all=all_play_all,
+)
 
 true_odds_df = calculate_true_odds(ranked)
-
-)
 
 # -----------------------------------
 # Results
