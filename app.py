@@ -132,6 +132,21 @@ all_play_all = st.sidebar.checkbox(
 )
 
 # -----------------------------------
+# Player Filters
+# -----------------------------------
+st.sidebar.header("Player Filters")
+
+hide_bad = st.sidebar.checkbox(
+    "Hide players below -0.75 base SG",
+    value=False,
+)
+
+hide_negative = st.sidebar.checkbox(
+    "Hide players below 0.00 base SG",
+    value=False,
+)
+
+# -----------------------------------
 # Run Model
 # -----------------------------------
 ranked = calculate_course_fit(golfers.copy(), weights)
