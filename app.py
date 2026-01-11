@@ -3,6 +3,7 @@ import pandas as pd
 
 from course_fit import calculate_course_fit
 from fantasy import add_cut_and_round_expectations
+from true_odds import calculate_true_odds
 
 st.set_page_config(page_title="PGA Course Fit Model", layout="wide")
 
@@ -156,6 +157,9 @@ ranked = add_cut_and_round_expectations(
     total_rounds=total_rounds,
     cut_size=cut_size,
     all_play_all=all_play_all,
+
+true_odds_df = calculate_true_odds(ranked)
+
 )
 
 # -----------------------------------
@@ -198,6 +202,21 @@ styled_df = (
         efficiency_color,
         subset=["efficiency"],
     )
+)
+
+st.subheader("True Odds")
+
+st.dataframe(
+    true_odds_df.style.format({
+        "Winner Odds": "{:+.0f}",
+        "Top 5 Odds": "{:+.0f}",
+        "Top 10 Odds": "{:+.0f}",
+        "Top 20 Odds": "{:+.0f}",
+        "Win %": "{:.2f}%",
+        "Top 5 %": "{:.2f}%",
+        "Top 10 %": "{:.2f}%",
+        "Top 20 %": "{:.2f}%",
+    })
 )
 
 st.dataframe(styled_df)
