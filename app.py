@@ -1,9 +1,84 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 
 from course_fit import calculate_course_fit
 from fantasy import add_cut_and_round_expectations
 from true_odds import calculate_true_odds
+
+def prob_to_american(prob):
+    """Convert probability to American odds"""
+    prob = max(min(prob, 0.999), 0.001)  # safety clamp
+
+    if prob >= 0.5:
+        return -round(100 * prob / (1 - prob))
+    else:
+        return round(100 * (1 - prob) / prob)
+
+
+def simulate_true_odds(
+    df,
+    n_sims=10_000,
+    sigma=1.4,
+    seed=42
+):
+    """
+    Monte Carlo simulation for true betting odds
+    based on course_sg
+    """
+
+    np.random.seed(seed)
+
+    players = df["player"].values
+    means = df["course_sg"].values
+    n_players = len(players)
+
+    # Counters
+    win = np.zeros(n_players)
+    top5 = np.zeros(n_players)
+    top10 = np.zeros(n_players)
+    top20 = np.zeros(n_players)
+
+    for _ in range(n_sims):
+        performance = means + np.random.normal(0, sigma, n_players)
+        ranks = performance.argsort()[::-1]
+
+        win[ranks[0]] += 1
+        top5[ranks[:5]] += 1
+        top10[ranks[:10]] += 1
+        top20[ranks[:20]] += 1
+
+    odds_df = pd.DataFrame({
+        "player": players,
+        "Win %": win / n_sims,
+        "Top 5 %": top5 / n_sims,
+        "Top 10 %": top10 / n_sims,
+        "Top 20 %": top20 / n_sims,
+    })
+
+    odds_df["Winner Odds"] = odds_df["Win %"].apply(prob_to_american)
+    odds_df["Top 5 Odds"] = odds_df["Top 5 %"].apply(prob_to_american)
+    odds_df["Top 10 Odds"] = odds_df["Top 10 %"].apply(prob_to_american)
+    odds_df["Top 20 Odds"] = odds_df["Top 20 %"].apply(prob_to_american)
+
+    # Column order
+    odds_df = odds_df[
+        [
+            "player",
+            "Winner Odds", "Win %",
+            "Top 5 Odds", "Top 5 %",
+            "Top 10 Odds", "Top 10 %",
+            "Top 20 Odds", "Top 20 %",
+        ]
+    ]
+
+    # Round percentages for display
+    for col in odds_df.columns:
+        if "%" in col:
+            odds_df[col] = (odds_df[col] * 100).round(2)
+
+    return odds_df.sort_values("Win %", ascending=False).reset_index(drop=True)
+
 
 st.set_page_config(page_title="PGA Course Fit Model", layout="wide")
 
@@ -159,7 +234,10 @@ ranked = add_cut_and_round_expectations(
     all_play_all=all_play_all,
 )
 
-true_odds_df = calculate_true_odds(ranked)
+true_odds_df = simulate_true_odds(
+    ranked,
+    n_sims=10_000,
+)
 
 # -----------------------------------
 # Results
@@ -216,6 +294,7 @@ st.dataframe(
         "Top 10 %": "{:.2f}%",
         "Top 20 %": "{:.2f}%",
     })
+    use_container_width=True
 )
 
 st.dataframe(styled_df)
