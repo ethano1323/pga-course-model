@@ -293,7 +293,7 @@ st.dataframe(
         "Top 5 %": "{:.2f}%",
         "Top 10 %": "{:.2f}%",
         "Top 20 %": "{:.2f}%",
-    })
+    }),
     use_container_width=True
 )
 
