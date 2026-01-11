@@ -146,8 +146,8 @@ golfers = golfers_2025.merge(
 # -----------------------------------
 
 golfers["base_sg"] = (
-    0.7 * golfers["base_sg_2025"]
-    + 0.3 * golfers["base_sg_3yr"]
+    0.75 * golfers["base_sg_2025"]
+    + 0.25 * golfers["base_sg_3yr"]
 )
 
 golfers["sg_app"] = golfers["sg_app_2025"]
