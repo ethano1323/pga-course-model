@@ -210,10 +210,10 @@ elif hide_bad:
 # -----------------------------------
 st.sidebar.header("Course Skill Weights")
 
-w_app  = st.sidebar.slider("Approach", 0.00, 1.00, 0.315)
-w_ott  = st.sidebar.slider("Off the Tee", 0.00, 1.00, 0.280)
-w_atg  = st.sidebar.slider("Around the Green", 0.00, 1.00, 0.185)
-w_putt = st.sidebar.slider("Putting", 0.00, 1.00, 0.220)
+w_app  = st.sidebar.slider("Approach", 0.0, 1.0, 0.32)
+w_ott  = st.sidebar.slider("Off the Tee", 0.0, 1.0, 0.28)
+w_atg  = st.sidebar.slider("Around the Green", 0.0, 1.0, 0.18)
+w_putt = st.sidebar.slider("Putting", 0.0, 1.0, 0.22)
 
 weights = {
     "app": w_app,
