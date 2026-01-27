@@ -1,57 +1,66 @@
 import numpy as np
 
-# -----------------------------------
-# PGA Tour Baseline Weights
-# -----------------------------------
 BASELINE_WEIGHTS = {
     "app": 0.32,
     "ott": 0.28,
     "atg": 0.18,
-    "putt": 0.22
+    "putt": 0.22,
 }
 
 def calculate_course_fit(df, course_weights, ch_weight=0.15):
-    baseline = BASELINE_WEIGHTS
+    """
+    Calculates course-adjusted SG with normalized course history weighting.
+    """
 
-    # Baseline SG decomposition
-    df["baseline_calc_sg"] = (
-        baseline["app"]  * df["sg_app"] +
-        baseline["ott"]  * df["sg_ott"] +
-        baseline["atg"]  * df["sg_atg"] +
-        baseline["putt"] * df["sg_putt"]
+    # -------------------------------
+    # Normalize course weights
+    # -------------------------------
+    total_w = sum(course_weights.values())
+    norm_w = {k: v / total_w for k, v in course_weights.items()}
+
+    # -------------------------------
+    # Baseline skill expectation
+    # -------------------------------
+    df["baseline_skill_sg"] = (
+        BASELINE_WEIGHTS["app"]  * df["sg_app"] +
+        BASELINE_WEIGHTS["ott"]  * df["sg_ott"] +
+        BASELINE_WEIGHTS["atg"]  * df["sg_atg"] +
+        BASELINE_WEIGHTS["putt"] * df["sg_putt"]
     )
 
-    # Course-specific adjustment (delta from baseline)
-    df["delta_sg"] = (
-        (course_weights["app"]  - baseline["app"])  * df["sg_app"] +
-        (course_weights["ott"]  - baseline["ott"])  * df["sg_ott"] +
-        (course_weights["atg"]  - baseline["atg"])  * df["sg_atg"] +
-        (course_weights["putt"] - baseline["putt"]) * df["sg_putt"]
+    # -------------------------------
+    # Course-weighted skill output
+    # -------------------------------
+    df["course_skill_sg"] = (
+        norm_w["app"]  * df["sg_app"] +
+        norm_w["ott"]  * df["sg_ott"] +
+        norm_w["atg"]  * df["sg_atg"] +
+        norm_w["putt"] * df["sg_putt"]
     )
 
-    # Course-adjusted SG
-    df["course_sg"] = df["base_sg"] + df["delta_sg"]
+    # -------------------------------
+    # Skill-based adjustment
+    # -------------------------------
+    df["skill_delta"] = df["course_skill_sg"] - df["baseline_skill_sg"]
 
-    # -----------------------------------
-    # Apply Course History Adjustment
-    # -----------------------------------
+    # Add skill delta to base SG
+    df["skill_adjusted_sg"] = df["base_sg"] + df["skill_delta"]
+
+    # -------------------------------
+    # NORMALIZED COURSE HISTORY BLEND
+    # -------------------------------
     df["course_sg"] = (
-        df["course_sg"] * (1 - ch_weight)
-        + df["ch_sg"] * ch_weight
+        (1 - ch_weight) * df["skill_adjusted_sg"]
+        + ch_weight * df["ch_sg"]
     )
 
-    # Differential vs baseline
+    # -------------------------------
+    # Outputs
+    # -------------------------------
     df["differential"] = df["course_sg"] - df["base_sg"]
 
-    # Efficiency metric
-    # Course efficiency (stable across all skill levels)
-    k = 0.35  # sensitivity scale (≈ meaningful SG swing)
-    df["efficiency"] = np.tanh(df["differential"] / k)
+    # Efficiency: stable, symmetric scaling
+    df["efficiency"] = df["differential"] / (1 + df["base_sg"].abs())
 
+    return df.sort_values("course_sg", ascending=False).reset_index(drop=True)
 
-    # Rounding for display
-    df["course_sg"] = df["course_sg"].round(2)
-    df["differential"] = df["differential"].round(2)
-    df["efficiency"] = df["efficiency"].round(2)
-
-    return df.sort_values("course_sg", ascending=False)
