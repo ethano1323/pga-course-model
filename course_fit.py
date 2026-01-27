@@ -36,7 +36,10 @@ def calculate_course_fit(df, course_weights):
     df["differential"] = df["course_sg"] - df["base_sg"]
 
     # Efficiency metric
-    df["efficiency"] = df["differential"] / df["base_sg"].replace(0, 0.01)
+    # Course efficiency (stable across all skill levels)
+    k = 0.35  # sensitivity scale (≈ meaningful SG swing)
+    df["efficiency"] = np.tanh(df["differential"] / k)
+
 
     # Rounding for display
     df["course_sg"] = df["course_sg"].round(2)
