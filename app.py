@@ -190,8 +190,8 @@ golfers = golfers_l30.merge(
 # -----------------------------------
 
 golfers["base_sg"] = (
-    0.70 * golfers["base_sg_l30"]
-    + 0.30 * golfers["base_sg_l200"]
+    0.40 * golfers["base_sg_l30"]
+    + 0.60 * golfers["base_sg_l200"]
 )
 
 golfers["sg_app"] = golfers["sg_app_l30"]
