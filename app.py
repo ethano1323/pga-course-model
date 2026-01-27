@@ -307,8 +307,9 @@ styled_df = (
         "expected_rounds": "{:.2f}",
         "efficiency": "{:.2f}",
     })
-    .applymap(
-        efficiency_color,
+    .apply(
+        efficiency_percentile_colors,
+        axis=0,
         subset=["efficiency"],
     )
 )
