@@ -10,7 +10,7 @@ BASELINE_WEIGHTS = {
     "putt": 0.22
 }
 
-def calculate_course_fit(df, course_weights):
+def calculate_course_fit(df, course_weights, ch_weight=0.15):
     baseline = BASELINE_WEIGHTS
 
     # Baseline SG decomposition
@@ -31,6 +31,14 @@ def calculate_course_fit(df, course_weights):
 
     # Course-adjusted SG
     df["course_sg"] = df["base_sg"] + df["delta_sg"]
+
+    # -----------------------------------
+    # Apply Course History Adjustment
+    # -----------------------------------
+    df["course_sg"] = (
+        df["course_sg"] * (1 - ch_weight)
+        + df["ch_sg"] * ch_weight
+    )
 
     # Differential vs baseline
     df["differential"] = df["course_sg"] - df["base_sg"]
