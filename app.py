@@ -90,12 +90,12 @@ st.title("PGA Projection and Simulation Model")
 st.sidebar.header("Upload Golfer SG Data")
 
 uploaded_2025 = st.sidebar.file_uploader(
-    "Upload 2025 Golfer SG CSV",
+    "Upload L30 Rounds Golfer SG CSV",
     type=["csv"],
 )
 
 uploaded_3yr = st.sidebar.file_uploader(
-    "Upload 3-Year Historical SG CSV",
+    "Upload Historical SG CSV",
     type=["csv"],
 )
 
@@ -146,8 +146,8 @@ golfers = golfers_2025.merge(
 # -----------------------------------
 
 golfers["base_sg"] = (
-    0.80 * golfers["base_sg_2025"]
-    + 0.20 * golfers["base_sg_3yr"]
+    0.3 * golfers["base_sg_2025"]
+    + 0.70 * golfers["base_sg_3yr"]
 )
 
 golfers["sg_app"] = golfers["sg_app_2025"]
