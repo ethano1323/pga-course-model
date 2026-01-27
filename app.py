@@ -261,13 +261,26 @@ display_df = ranked[
     ]
 ].reset_index(drop=True)
 
-def efficiency_color(val):
-    if val > 0.25:
-        return "background-color: #1b7837"  # dark green
-    elif val < -0.25:
-        return "background-color: #762a83"  # dark red
-    else:
-        return ""
+def efficiency_percentile_colors(df, col="efficiency"):
+    values = df[col]
+    ranks = values.rank(method="min", ascending=False, pct=True)
+
+    styles = []
+
+    for pct in ranks:
+        if pct <= 0.10:
+            styles.append("background-color: darkgreen; color: white;")
+        elif pct <= 0.20:
+            styles.append("background-color: lightgreen;")
+        elif pct >= 0.90:
+            styles.append("background-color: darkred; color: white;")
+        elif pct >= 0.80:
+            styles.append("background-color: lightcoral;")
+        else:
+            styles.append("")
+
+    return styles
+
 
 styled_df = (
     display_df
