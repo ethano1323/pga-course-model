@@ -147,8 +147,8 @@ if uploaded_course_history is not None:
 else:
     course_history = None
 
-golfers_L30 = pd.read_csv(uploaded_L30)
-golfers_L200 = pd.read_csv(uploaded_L200)
+golfers_l30 = pd.read_csv(uploaded_L30)
+golfers_l200 = pd.read_csv(uploaded_L200)
 
 # -----------------------------------
 # Validate Columns
