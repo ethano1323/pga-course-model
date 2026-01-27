@@ -6,6 +6,29 @@ from course_fit import calculate_course_fit
 from fantasy import add_cut_and_round_expectations
 from true_odds import calculate_true_odds
 
+# -----------------------------------
+# Styling Helpers
+# -----------------------------------
+def efficiency_percentile_colors(df, col="efficiency"):
+    values = df[col]
+    ranks = values.rank(method="min", ascending=False, pct=True)
+
+    styles = []
+
+    for pct in ranks:
+        if pct <= 0.10:
+            styles.append("background-color: darkgreen; color: white;")
+        elif pct <= 0.20:
+            styles.append("background-color: lightgreen;")
+        elif pct >= 0.90:
+            styles.append("background-color: darkred; color: white;")
+        elif pct >= 0.80:
+            styles.append("background-color: lightcoral;")
+        else:
+            styles.append("")
+
+    return styles
+
 BASELINE_WEIGHTS = {
     "app": 0.32,
     "ott": 0.28,
@@ -272,28 +295,6 @@ styled_df = display_df.style.apply(
 # Display it
 st.subheader("Course-Adjusted SG Rankings")
 st.dataframe(styled_df, use_container_width=True)
-
-
-def efficiency_percentile_colors(df, col="efficiency"):
-    values = df[col]
-    ranks = values.rank(method="min", ascending=False, pct=True)
-
-    styles = []
-
-    for pct in ranks:
-        if pct <= 0.10:
-            styles.append("background-color: darkgreen; color: white;")
-        elif pct <= 0.20:
-            styles.append("background-color: lightgreen;")
-        elif pct >= 0.90:
-            styles.append("background-color: darkred; color: white;")
-        elif pct >= 0.80:
-            styles.append("background-color: lightcoral;")
-        else:
-            styles.append("")
-
-    return styles
-
 
 styled_df = (
     display_df
