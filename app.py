@@ -129,7 +129,7 @@ uploaded_3yr = st.sidebar.file_uploader(
 )
 
 if uploaded_2025 is None or uploaded_3yr is None:
-    st.warning("Please upload BOTH the 2025 and 3-Year SG CSVs to continue.")
+    st.warning("Please upload BOTH CSVs to continue.")
     st.stop()
 
 golfers_2025 = pd.read_csv(uploaded_2025)
@@ -283,6 +283,18 @@ display_df = ranked[
         "efficiency",
     ]
 ].reset_index(drop=True)
+
+# -----------------------------------
+# Round values for display (CRITICAL)
+# -----------------------------------
+display_df = display_df.round({
+    "base_sg": 2,
+    "course_sg": 2,
+    "differential": 2,
+    "cut_prob": 2,
+    "expected_rounds": 2,
+    "efficiency": 2,
+})
 
 # Style it
 styled_df = display_df.style.apply(
