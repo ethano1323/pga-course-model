@@ -249,6 +249,7 @@ true_odds_df = simulate_true_odds(
 # -----------------------------------
 # Results
 # -----------------------------------
+# Build display dataframe
 display_df = ranked[
     [
         "player",
@@ -260,6 +261,18 @@ display_df = ranked[
         "efficiency",
     ]
 ].reset_index(drop=True)
+
+# Style it
+styled_df = display_df.style.apply(
+    efficiency_percentile_colors,
+    col="efficiency",
+    subset=["efficiency"],
+)
+
+# Display it
+st.subheader("Course-Adjusted SG Rankings")
+st.dataframe(styled_df, use_container_width=True)
+
 
 def efficiency_percentile_colors(df, col="efficiency"):
     values = df[col]
@@ -314,10 +327,6 @@ st.dataframe(
     }),
     use_container_width=True
 )
-
-st.subheader("Course-Adjusted Data")
-
-st.dataframe(styled_df)
 
 # -----------------------------------
 # Download
