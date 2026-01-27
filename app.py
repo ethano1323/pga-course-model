@@ -118,22 +118,23 @@ st.title("PGA Projection and Simulation Model")
 # -----------------------------------
 st.sidebar.header("Upload Golfer SG Data")
 
-uploaded_2025 = st.sidebar.file_uploader(
+uploaded_L30 = st.sidebar.file_uploader(
     "Upload L30 Rounds Golfer SG CSV",
     type=["csv"],
 )
 
-uploaded_3yr = st.sidebar.file_uploader(
-    "Upload Historical SG CSV",
+uploaded_L200 = st.sidebar.file_uploader(
+    "Upload L200 Rounds Golfer SG CSV",
     type=["csv"],
 )
+
 
 uploaded_course_history = st.sidebar.file_uploader(
     "Upload Course History CSV",
     type=["csv"],
 )
 
-if uploaded_2025 is None or uploaded_3yr is None:
+if uploaded_L30 is None or uploaded_L200 is None:
     st.warning("Please upload BOTH CSVs to continue.")
     st.stop()
 
@@ -146,8 +147,8 @@ if uploaded_course_history is not None:
 else:
     course_history = None
 
-golfers_2025 = pd.read_csv(uploaded_2025)
-golfers_3yr = pd.read_csv(uploaded_3yr)
+golfers_L30 = pd.read_csv(uploaded_L30)
+golfers_L200 = pd.read_csv(uploaded_L200)
 
 # -----------------------------------
 # Validate Columns
@@ -162,25 +163,25 @@ required_columns = {
     "sg_ott",
 }
 
-missing_2025 = required_columns - set(golfers_2025.columns)
-missing_3yr = required_columns - set(golfers_3yr.columns)
+missing_l30 = required_columns - set(golfers_l30.columns)
+missing_l200 = required_columns - set(golfers_l200.columns)
 
-if missing_2025:
-    st.error(f"2025 data missing columns: {', '.join(missing_2025)}")
+if missing_l30:
+    st.error(f"L30 data missing columns: {', '.join(missing_l30)}")
     st.stop()
 
-if missing_3yr:
-    st.error(f"3-Year data missing columns: {', '.join(missing_3yr)}")
+if missing_l200:
+    st.error(f"L200 data missing columns: {', '.join(missing_l200)}")
     st.stop()
 
 # -----------------------------------
 # Merge the Data
 # -----------------------------------
 
-golfers = golfers_2025.merge(
-    golfers_3yr,
+golfers = golfers_l30.merge(
+    golfers_l200,
     on="player",
-    suffixes=("_2025", "_3yr"),
+    suffixes=("_l30", "_l200"),
     how="inner",
 )
 
@@ -189,14 +190,14 @@ golfers = golfers_2025.merge(
 # -----------------------------------
 
 golfers["base_sg"] = (
-    0.3 * golfers["base_sg_2025"]
-    + 0.70 * golfers["base_sg_3yr"]
+    0.70 * golfers["base_sg_l30"]
+    + 0.30 * golfers["base_sg_l200"]
 )
 
-golfers["sg_app"] = golfers["sg_app_2025"]
-golfers["sg_ott"] = golfers["sg_ott_2025"]
-golfers["sg_atg"] = golfers["sg_atg_2025"]
-golfers["sg_putt"] = golfers["sg_putt_2025"]
+golfers["sg_app"] = golfers["sg_app_l30"]
+golfers["sg_ott"] = golfers["sg_ott_l30"]
+golfers["sg_atg"] = golfers["sg_atg_l30"]
+golfers["sg_putt"] = golfers["sg_putt_l30"]
 
 # -----------------------------------
 # Course History Integration
@@ -292,7 +293,11 @@ ch_weight = st.sidebar.slider(
 # -----------------------------------
 # Run Model
 # -----------------------------------
-ranked = calculate_course_fit(golfers.copy(), weights)
+ranked = calculate_course_fit(
+    golfers.copy(),
+    weights,
+    ch_weight=ch_weight,
+)
 
 ranked = add_cut_and_round_expectations(
     ranked,
