@@ -287,27 +287,6 @@ display_df = ranked[
 # -----------------------------------
 # Round values for display (CRITICAL)
 # -----------------------------------
-display_df = display_df.round({
-    "base_sg": 2,
-    "course_sg": 2,
-    "differential": 2,
-    "cut_prob": 2,
-    "expected_rounds": 2,
-    "efficiency": 2,
-})
-
-# Style it
-styled_df = display_df.style.apply(
-    efficiency_percentile_colors,
-    axis=0,
-    subset=["efficiency"],
-)
-
-
-# Display it
-st.subheader("Course-Adjusted SG Rankings")
-st.dataframe(styled_df, use_container_width=True)
-
 styled_df = (
     display_df
     .style
@@ -325,6 +304,9 @@ styled_df = (
         subset=["efficiency"],
     )
 )
+
+st.subheader("Course-Adjusted SG Rankings")
+st.dataframe(styled_df, use_container_width=True)
 
 st.subheader("True Odds")
 
