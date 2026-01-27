@@ -9,12 +9,10 @@ from true_odds import calculate_true_odds
 # -----------------------------------
 # Styling Helpers
 # -----------------------------------
-def efficiency_percentile_colors(df, col="efficiency"):
-    values = df[col]
-    ranks = values.rank(method="min", ascending=False, pct=True)
+def efficiency_percentile_colors(series):
+    ranks = series.rank(method="min", ascending=False, pct=True)
 
     styles = []
-
     for pct in ranks:
         if pct <= 0.10:
             styles.append("background-color: darkgreen; color: white;")
@@ -28,6 +26,7 @@ def efficiency_percentile_colors(df, col="efficiency"):
             styles.append("")
 
     return styles
+
 
 BASELINE_WEIGHTS = {
     "app": 0.32,
@@ -288,9 +287,10 @@ display_df = ranked[
 # Style it
 styled_df = display_df.style.apply(
     efficiency_percentile_colors,
-    col="efficiency",
+    axis=0,
     subset=["efficiency"],
 )
+
 
 # Display it
 st.subheader("Course-Adjusted SG Rankings")
