@@ -128,9 +128,23 @@ uploaded_3yr = st.sidebar.file_uploader(
     type=["csv"],
 )
 
+uploaded_course_history = st.sidebar.file_uploader(
+    "Upload Course History CSV",
+    type=["csv"],
+)
+
 if uploaded_2025 is None or uploaded_3yr is None:
     st.warning("Please upload BOTH CSVs to continue.")
     st.stop()
+
+if uploaded_course_history is not None:
+    course_history = pd.read_csv(uploaded_course_history)
+
+    if not {"player", "ch_sg"}.issubset(course_history.columns):
+        st.error("Course history file must contain: player, ch_sg")
+        st.stop()
+else:
+    course_history = None
 
 golfers_2025 = pd.read_csv(uploaded_2025)
 golfers_3yr = pd.read_csv(uploaded_3yr)
@@ -183,6 +197,20 @@ golfers["sg_app"] = golfers["sg_app_2025"]
 golfers["sg_ott"] = golfers["sg_ott_2025"]
 golfers["sg_atg"] = golfers["sg_atg_2025"]
 golfers["sg_putt"] = golfers["sg_putt_2025"]
+
+# -----------------------------------
+# Course History Integration
+# -----------------------------------
+if course_history is not None:
+    golfers = golfers.merge(
+        course_history[["player", "ch_sg"]],
+        on="player",
+        how="left",
+    )
+    golfers["ch_sg"] = golfers["ch_sg"].fillna(0.0)
+else:
+    golfers["ch_sg"] = -0.038
+
 
 # -----------------------------------
 # Event Structure
@@ -250,6 +278,16 @@ weights = {
     "atg": w_atg,
     "putt": w_putt,
 }
+
+st.sidebar.header("Course History Weight")
+
+ch_weight = st.sidebar.slider(
+    "Course History Impact",
+    min_value=0.10,
+    max_value=0.20,
+    value=0.15,
+    step=0.01,
+)
 
 # -----------------------------------
 # Run Model
