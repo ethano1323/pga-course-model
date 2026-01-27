@@ -6,6 +6,13 @@ from course_fit import calculate_course_fit
 from fantasy import add_cut_and_round_expectations
 from true_odds import calculate_true_odds
 
+BASELINE_WEIGHTS = {
+    "app": 0.32,
+    "ott": 0.28,
+    "atg": 0.18,
+    "putt": 0.22
+}
+
 def prob_to_american(prob):
     """Convert probability to American odds"""
     prob = max(min(prob, 0.999), 0.001)  # safety clamp
