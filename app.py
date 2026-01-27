@@ -135,7 +135,7 @@ uploaded_course_history = st.sidebar.file_uploader(
 )
 
 if uploaded_L30 is None or uploaded_L200 is None:
-    st.warning("Please upload BOTH CSVs to continue.")
+    st.warning("Please upload All CSVs to continue.")
     st.stop()
 
 if uploaded_course_history is not None:
