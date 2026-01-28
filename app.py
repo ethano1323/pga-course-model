@@ -319,6 +319,7 @@ display_df = ranked[
     [
         "player",
         "base_sg",
+        "ch_sg",          
         "course_sg",
         "differential",
         "cut_prob",
@@ -335,6 +336,7 @@ styled_df = (
     .style
     .format({
         "base_sg": "{:.2f}",
+        "ch_sg": "{:.2f}",       # <-- add formatting
         "course_sg": "{:.2f}",
         "differential": "{:.2f}",
         "cut_prob": "{:.2f}",
