@@ -204,14 +204,33 @@ golfers["sg_putt"] = golfers["sg_putt_l30"]
 # -----------------------------------
 if course_history is not None:
     golfers = golfers.merge(
-        course_history[["player", "ch_sg"]],
+        course_history[["player", "ch_sg", "experience_adjustment"]],
         on="player",
         how="left",
     )
-    golfers["ch_sg"] = golfers["ch_sg"].fillna(0.0)
-else:
-    golfers["ch_sg"] = -0.038
 
+    # Fill missing ch_sg with base_sg - experience_adjustment
+    golfers["ch_sg"] = golfers.apply(
+        lambda row: row["base_sg"] - row["experience_adjustment"]
+        if pd.isna(row["ch_sg"]) or row["ch_sg"] == 0
+        else row["ch_sg"],
+        axis=1
+    )
+else:
+    # If no course history CSV provided, just use base_sg - small default adjustment
+    golfers["ch_sg"] = golfers["base_sg"] - 0.038
+
+# -----------------------------------
+# Calculate final Course SG
+# -----------------------------------
+# User-defined weight for course history (slider ch_weight)
+base_weight = 1 - ch_weight
+
+# Combine base SG (from L30/L200 blend) with course history
+golfers["course_sg"] = (
+    base_weight * golfers["base_sg"] +
+    ch_weight * golfers["ch_sg"]
+)
 
 # -----------------------------------
 # Event Structure
