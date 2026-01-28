@@ -220,6 +220,15 @@ else:
     # If no course history CSV provided, just use base_sg - small default adjustment
     golfers["ch_sg"] = golfers["base_sg"] - 0.038
 
+st.sidebar.header("Course History Weight")
+ch_weight = st.sidebar.slider(
+    "Course History Impact",
+    min_value=0.10,
+    max_value=0.20,
+    value=0.15,
+    step=0.01,
+)
+
 # -----------------------------------
 # Calculate final Course SG
 # -----------------------------------
@@ -298,16 +307,6 @@ weights = {
     "atg": w_atg,
     "putt": w_putt,
 }
-
-st.sidebar.header("Course History Weight")
-
-ch_weight = st.sidebar.slider(
-    "Course History Impact",
-    min_value=0.10,
-    max_value=0.20,
-    value=0.15,
-    step=0.01,
-)
 
 # -----------------------------------
 # Run Model
