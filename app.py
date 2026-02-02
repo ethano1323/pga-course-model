@@ -48,7 +48,7 @@ def prob_to_american(prob):
 def simulate_true_odds(
     df,
     n_sims=10_000,
-    sigma=1.4,
+    sigma=1.6,
     seed=42
 ):
     """
@@ -69,7 +69,8 @@ def simulate_true_odds(
     top20 = np.zeros(n_players)
 
     for _ in range(n_sims):
-        performance = means + np.random.normal(0, sigma, n_players)
+        player_sigma = sigma * (1 + 0.25 * np.abs(means))
+        performance = means + np.random.normal(0, player_sigma)
         ranks = performance.argsort()[::-1]
 
         win[ranks[0]] += 1
