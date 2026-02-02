@@ -78,6 +78,14 @@ def simulate_true_odds(
         top10[ranks[:10]] += 1
         top20[ranks[:20]] += 1
 
+    course_shock = np.random.normal(0, 0.3)
+    performance = (
+        means + 0.93 +
+        course_shock +
+        np.random.normal(0, player_sigma)
+    )
+
+
     odds_df = pd.DataFrame({
         "player": players,
         "Win %": win / n_sims,
